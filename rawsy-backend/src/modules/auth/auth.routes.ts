@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction,Request,Response, Router } from "express";
 import {
   register,
   login,
@@ -88,11 +88,8 @@ router.put("/me/location", authenticate, updateFactoryOrBusinessLocation);
 router.post(
   "/me/upload-doc",
   authenticate,
-  (req, res, next) =>
-    uploadSingle("file")(req, res, (err) => {
-      if (err) return res.status(400).json({ error: err.message });
-      next();
-    }),
+    
+    uploadSingle("file"),
   uploadVerificationDoc
 );
 

@@ -36,9 +36,9 @@ export const loginUser = async (emailOrPhone: string, password: string) => {
     throw new Error("User not found");
   }
 
-  // Check deactivated
-  if (user.status === "deactivated") {
-    throw new Error("Your account has been deactivated. Contact admin.");
+  // Check suspended
+  if (user.status === "suspended") {
+    throw new Error("Your account has been suspended. Contact admin.");
   }
 
   // Compare passwords
