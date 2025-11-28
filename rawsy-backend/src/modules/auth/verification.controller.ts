@@ -75,13 +75,12 @@ export const uploadVerificationDoc = async (req: Request, res: Response) => {
       filename
     });
 
-    // Create the document object first
+    // Create the document object first - let Mongoose set uploadedAt via default
     const newDoc = {
       url: fileUrl,
       filename: filename,
       type: docType,
-      status: "pending" as const,
-      uploadedAt: new Date()
+      status: "pending" as const
     };
 
     console.log("15. Document to push:", newDoc);
