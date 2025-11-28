@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native';
 import {
   Text,
   TextInput,
@@ -272,10 +272,11 @@ export default function AddProductScreen() {
                 {images.map((uri, index) => (
                   <View key={index} style={styles.imagePreview}>
                     <Surface style={styles.imageContainer} elevation={2}>
-                      <img
-                        src={uri}
-                        alt={`Preview ${index + 1}`}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      <Image
+                        source={{ uri }}
+                        accessibilityLabel={`Preview ${index + 1}`}
+                        style={{ width: '100%', height: '100%' }}
+                        resizeMode="cover"
                       />
                     </Surface>
                     <Button
