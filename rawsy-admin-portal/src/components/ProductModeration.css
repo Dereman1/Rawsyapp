@@ -1,0 +1,374 @@
+.product-moderation {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.management-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.refresh-button {
+  padding: 10px 20px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: #1d4ed8;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.error-banner {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #dc2626;
+  font-size: 14px;
+}
+
+.filter-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.filter-btn.active {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.products-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.products-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s;
+}
+
+.products-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.products-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.products-table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.no-data {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-error {
+  background-color: #fecaca;
+  color: #7f1d1d;
+}
+
+.badge-default {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.action-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-view {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-view:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.btn-approve {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-approve:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.btn-reject {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.btn-reject-confirm {
+  background-color: #dc2626;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.btn-reject-confirm:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.btn-reject-cancel {
+  background-color: #6b7280;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.btn-reject-cancel:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.btn-flag {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.btn-flag:hover:not(:disabled) {
+  background-color: #d97706;
+}
+
+.flagged-label {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.reject-form {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 250px;
+}
+
+.reject-textarea {
+  flex: 1;
+  min-width: 180px;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 40px;
+  max-height: 100px;
+}
+
+.reject-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+@media (max-width: 1024px) {
+  .products-table {
+    font-size: 13px;
+  }
+
+  .products-table th,
+  .products-table td {
+    padding: 10px 12px;
+  }
+
+  .action-buttons button {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-moderation {
+    padding: 16px;
+  }
+
+  .management-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .filter-section {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .products-table {
+    min-width: 800px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .reject-form {
+    flex-direction: column;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .reject-textarea {
+    min-width: auto;
+    width: 100%;
+  }
+}

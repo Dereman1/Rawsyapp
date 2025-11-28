@@ -1,0 +1,109 @@
+/* Layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.app-header {
+  background-color: #2563eb;
+  color: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.user-info {
+  font-size: 0.95rem;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* NAVIGATION */
+.app-nav {
+  background-color: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+  display: flex;
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  color: #6b7280;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  border-bottom: 3px solid transparent;
+  text-align: left;
+}
+
+.nav-tab:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.nav-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  background-color: white;
+}
+
+/* MAIN SECTION */
+.app-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* WELCOME BOX */
+.welcome-section {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.welcome-section h2 {
+  font-size: 2rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.welcome-section p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}

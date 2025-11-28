@@ -1,0 +1,56 @@
+########################################
+# Global Ignores
+########################################
+node_modules/
+dist/
+build/
+temp/
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.vscode/
+.idea/
+.env
+.env.local
+
+########################################
+# Rawsy Backend
+########################################
+rawsy-backend/node_modules/
+rawsy-backend/dist/
+rawsy-backend/logs/
+rawsy-backend/temp/
+rawsy-backend/.env
+rawsy-backend/.env.local
+rawsy-backend/src/config/firebase-service-account.json
+
+########################################
+# Rawsy Mobile Frontend
+########################################
+rawsy-frontend/node_modules/
+rawsy-frontend/build/
+rawsy-frontend/dist/
+rawsy-frontend/.expo/
+rawsy-frontend/.expo-shared/
+rawsy-frontend/web-build/
+rawsy-frontend/temp/
+rawsy-frontend/logs/
+rawsy-frontend/.env
+rawsy-frontend/.env.local
+
+########################################
+# Rawsy Admin Portal (Next.js)
+########################################
+rawsy-admin-portal/node_modules/
+rawsy-admin-portal/build/
+rawsy-admin-portal/dist/
+rawsy-admin-portal/.expo/
+rawsy-admin-portal/.expo-shared/
+rawsy-admin-portal/web-build/
+rawsy-admin-portal/temp/
+rawsy-admin-portal/logs/
+rawsy-admin-portal/.env
+rawsy-admin-portal/.env.local
+
