@@ -16,19 +16,22 @@ const UserSchema = new Schema(
     },
 
     // 🔐 Supplier verification documents
-    verificationDocs: [
-      {
-        url: String,
-        filename: String,
-        type: String,
-        status: {
-          type: String,
-          enum: ["pending", "approved", "rejected"],
-          default: "pending"
-        },
-        uploadedAt: { type: Date, default: Date.now }
-      }
-    ],
+    verificationDocs: {
+      type: [
+        {
+          url: { type: String, required: true },
+          filename: { type: String, required: true },
+          type: { type: String, default: "business_doc" },
+          status: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending"
+          },
+          uploadedAt: { type: Date, default: Date.now }
+        }
+      ],
+      default: []
+    },
 
     // 🟡 Account status
     status: {

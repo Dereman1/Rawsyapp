@@ -36,33 +36,30 @@ export const uploadVerificationDoc = async (req: Request, res: Response) => {
     const fileUrl = uploadResult.secure_url;
     const filename = uploadResult.public_id;
 
-    // Fetch current user and update verificationDocs manually
-    const currentUser = await User.findById(user.id);
+    // Use findByIdAndUpdate with $addToSet to add document
+    const updated = await User.findByIdAndUpdate(
+      user.id,
+      {
+        $addToSet: {
+          verificationDocs: {
+            url: fileUrl,
+            filename: filename,
+            type: docType,
+            status: "pending"
+          }
+        }
+      },
+      {
+        new: true,
+        runValidators: false
+      }
+    ).select("-password");
 
-    if (!currentUser) {
+    if (!updated) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Add new document to the array
-    if (!currentUser.verificationDocs) {
-      currentUser.verificationDocs = [];
-    }
-
-    currentUser.verificationDocs.push({
-      url: fileUrl,
-      filename: filename,
-      type: docType,
-      status: "pending",
-      uploadedAt: new Date()
-    } as any);
-
-    // Save the user document
-    await currentUser.save();
-
-    // Fetch updated user without password
-    const updated = await User.findById(user.id).select("-password");
-
-    const lastDoc = updated?.verificationDocs && updated.verificationDocs.length > 0
+    const lastDoc = updated.verificationDocs && updated.verificationDocs.length > 0
       ? updated.verificationDocs[updated.verificationDocs.length - 1]
       : null;
 
