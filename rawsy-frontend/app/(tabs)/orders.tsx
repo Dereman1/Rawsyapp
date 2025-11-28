@@ -155,6 +155,31 @@ export default function OrdersScreen() {
       setActioningOrderId(null);
     }
   };
+const handleCancelOrder = async (orderId: string) => {
+  Alert.alert(
+    'Cancel Order',
+    'Are you sure you want to cancel this order?',
+    [
+      { text: 'No', style: 'cancel' },
+      {
+        text: 'Yes',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setActioningOrderId(orderId); // show loading state on this order
+            await api.put(`/orders/${orderId}/cancel`); // call backend cancel endpoint
+            Alert.alert('Success', 'Order cancelled successfully');
+            await fetchOrders(); // refresh orders list
+          } catch (error: any) {
+            Alert.alert('Error', error.response?.data?.error || 'Failed to cancel order');
+          } finally {
+            setActioningOrderId(null);
+          }
+        },
+      },
+    ]
+  );
+};
 
   const handleMarkDelivered = async (orderId: string) => {
     try {
@@ -419,6 +444,20 @@ export default function OrdersScreen() {
                         Upload Payment Proof
                       </Button>
                     )}
+                     {user?.role === 'manufacturer' &&
+  user._id === order.manufacturer &&
+  order.status === 'placed' && (
+    <Button
+      mode="contained"
+      onPress={() => handleCancelOrder(order._id)}
+      style={styles.actionButton} // create a style for this button
+      icon="cancel"
+      loading={actioningOrderId === order._id} // optional: show spinner while cancelling
+      disabled={actioningOrderId === order._id} // prevent multiple clicks
+    >
+      Cancel Order
+    </Button>
+)}
 
                   {order.paymentProof && (
                     <View style={[styles.proofSection, { backgroundColor: theme.colors.primaryContainer }]}>
