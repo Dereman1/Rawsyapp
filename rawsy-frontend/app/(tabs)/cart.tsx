@@ -51,7 +51,23 @@ export default function CartScreen() {
   };
 
   const handleCheckout = async () => {
-    if (!user?.factoryLocation?.address) {
+    if (cart.length === 0) {
+      Alert.alert('Error', 'Your cart is empty');
+      return;
+    }
+
+    const firstProduct = cart[0]?.product;
+    if (!firstProduct) {
+      Alert.alert('Error', 'Invalid cart data');
+      return;
+    }
+
+    const deliveryRequired = cart.some((item) => {
+      const prod = item.product;
+      return prod?.deliveryAvailable && prod?.deliveryAllowed !== false;
+    });
+
+    if (deliveryRequired && !user?.factoryLocation?.address) {
       Alert.alert(
         'Delivery Address Required',
         'Please set your factory location in your profile before placing an order.',
@@ -63,11 +79,29 @@ export default function CartScreen() {
       return;
     }
 
+    const availablePaymentMethods = firstProduct.paymentMethod &&
+                                    Array.isArray(firstProduct.paymentMethod) &&
+                                    firstProduct.paymentMethod.length > 0
+      ? firstProduct.paymentMethod
+      : ['bank_transfer'];
+
+    const paymentMethod = availablePaymentMethods[0];
+
     try {
       setCheckingOut(true);
-      const response = await api.post('/cart/checkout', {
-        paymentMethod: 'bank_transfer',
-      });
+      const checkoutPayload: any = {
+        paymentMethod: paymentMethod,
+      };
+
+      if (deliveryRequired && user?.factoryLocation) {
+        checkoutPayload.delivery = {
+          address: user.factoryLocation.address,
+          contactName: user.factoryLocation.contactName,
+          contactPhone: user.factoryLocation.contactPhone,
+        };
+      }
+
+      const response = await api.post('/cart/checkout', checkoutPayload);
       Alert.alert('Success', 'Order placed successfully!');
       await fetchCart();
     } catch (error: any) {
