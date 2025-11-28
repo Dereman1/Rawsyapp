@@ -37,7 +37,11 @@ export const placeOrder = async (req: Request, res: Response) => {
     const supplierId = product.supplier.toString();
     const unitPrice = product.price;
     const subtotal = unitPrice * quantity;
-
+    const availableMethods = product.paymentMethod || ["bank_transfer"];
+const finalPaymentMethod =
+  paymentMethod && availableMethods.includes(paymentMethod)
+    ? paymentMethod
+    : availableMethods[0];
     const items = [
       {
         product: product._id,
@@ -54,7 +58,7 @@ export const placeOrder = async (req: Request, res: Response) => {
       supplier: supplierId,
       items,
       total: subtotal,
-      paymentMethod: paymentMethod || "bank_transfer",
+      paymentMethod: finalPaymentMethod,
       delivery,
       status: "placed",
       stockReserved: true,

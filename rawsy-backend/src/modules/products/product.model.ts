@@ -33,6 +33,11 @@ const ProductSchema = new Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending"      
     },
+    paymentMethod: {
+  type: String,
+  enum: ["bank_transfer", "cash on delivery"],
+  default: ["bank_transfer"]
+},
     rejectionReason: { type: String, default: null },
 
     // ⭐ Rating
