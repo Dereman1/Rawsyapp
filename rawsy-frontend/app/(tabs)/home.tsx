@@ -120,7 +120,7 @@ function ManufacturerHome({ homeData, refreshing, onRefresh }: any) {
                 onPress={() => router.push(action.screen as any)}
               >
                 <Card.Content style={styles.actionContent}>
-                  <MaterialIcons name={action.icon as any} size={32} color={theme.colors.primary} />
+                  <MaterialIcons name={action.icon as any} size={32} color={theme.colors.onSecondary} />
                   <Text variant="bodyMedium" style={[styles.actionLabel, { color: theme.colors.onSurface }]}>
                     {action.label}
                   </Text>

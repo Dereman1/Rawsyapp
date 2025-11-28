@@ -32,7 +32,6 @@ export default function CompleteProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
-
   const isSupplier = user?.role === 'supplier';
   const isManufacturer = user?.role === 'manufacturer';
 
@@ -269,16 +268,16 @@ export default function CompleteProfileScreen() {
             </HelperText>
           )}
 
-          <View style={styles.infoBox}>
+          {/* <View style={styles.infoBox}>
             <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, lineHeight: 20 }}>
               {isManufacturer
                 ? 'You can complete your profile now or skip and do it later from your account settings.'
                 : 'Suppliers must provide business location and contact details to start selling on Rawsy.'}
             </Text>
-          </View>
+          </View> */}
         </ScrollView>
 
-        <Surface style={styles.footer} elevation={4}>
+        <Surface style={[styles.footer, { backgroundColor: theme.colors.background }]} elevation={4}>
           <Button mode="outlined" onPress={handleSkip} style={styles.footerButton} disabled={loading}>
             {isManufacturer ? 'Skip for Now' : 'Complete Later'}
           </Button>
@@ -346,9 +345,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 12,
-    backgroundColor: '#fff',
   },
   footerButton: {
     flex: 1,
+    marginBottom: 40
   },
 });

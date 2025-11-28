@@ -23,12 +23,12 @@ const AboutScreen: React.FC = () => {
         <Surface style={[styles.card, { backgroundColor: paperTheme.colors.surface }]} elevation={1}>
           {/* Logo */}
           <Image
-            source={require('../assets/images/icon.png')}
+            source={require('../assets/images/rawsy.png')}
             style={styles.logo}
           />
 
           <Text variant="headlineSmall" style={[styles.title, { color: paperTheme.colors.onSurface }]}>
-            {t('aboutAppTitle') ?? 'About Rawsy'}
+            { 'About Rawsy'}
           </Text>
 
           {/* Description */}
@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    marginBottom: 40,
   },
   card: {
     padding: 20,
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 16,
     resizeMode: 'contain',
+    borderRadius: 60,
   },
   title: {
     textAlign: 'center',

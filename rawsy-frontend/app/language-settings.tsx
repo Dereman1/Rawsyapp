@@ -88,11 +88,11 @@ export default function LanguageSettingsScreen() {
           </RadioButton.Group>
         </List.Section>
 
-        <View style={styles.infoBox}>
+        {/* <View style={styles.infoBox}>
           <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, lineHeight: 20 }}>
             Note: Language selection is only available for manufacturers. Suppliers will always see English.
           </Text>
-        </View>
+        </View> */}
       </View>
 
       <View style={[styles.footer, { backgroundColor: theme.colors.surface }]}>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoBox: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#2e69e0ff',
     padding: 12,
     borderRadius: 8,
     marginTop: 24,
@@ -149,5 +149,6 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     paddingVertical: 8,
+    marginBottom: 40
   },
 });
