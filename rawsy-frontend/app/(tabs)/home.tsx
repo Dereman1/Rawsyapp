@@ -338,12 +338,19 @@ function SupplierDashboard({ homeData, refreshing, onRefresh }: any) {
                 Manage your business operations
               </Text>
             </View>
-            <Avatar.Text
-              size={56}
-              label={user?.name?.charAt(0).toUpperCase() || 'S'}
-              style={{ backgroundColor: theme.colors.primary }}
-              color="#fff"
-            />
+            {user?.profileImage ? (
+                       <Avatar.Image
+                         size={80}
+                         source={{ uri: user.profileImage }}
+                         style={styles.avatar}
+                       />
+                     ) : (
+                       <Avatar.Text
+                         size={80}
+                         label={user?.name?.charAt(0).toUpperCase() || 'U'}
+                         style={styles.avatar}
+                       />
+                     )}
           </View>
         </Surface>
 
@@ -581,6 +588,9 @@ const styles = StyleSheet.create({
   statsCard: { margin: 16, padding: 16, borderRadius: 12 },
   statsGrid: { flexDirection: 'row', gap: 12 },
   statBox: { alignItems: 'center', flex: 1 },
+   avatar: {
+    marginBottom: 16,
+  },
   statCard: { flex: 1, borderRadius: 12 },
   statCardContent: { alignItems: 'center', paddingVertical: 8 },
   statValue: { fontWeight: 'bold', marginTop: 8 },

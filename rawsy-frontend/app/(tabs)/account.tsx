@@ -46,11 +46,21 @@ export default function AccountScreen() {
 
       <ScrollView style={styles.content}>
         <Surface style={styles.profileSection} elevation={1}>
-          <Avatar.Text
-            size={80}
-            label={user?.name?.charAt(0).toUpperCase() || 'U'}
-            style={styles.avatar}
-          />
+          {user?.profileImage ? (
+            <Avatar.Image
+              size={80}
+              source={{ uri: user.profileImage }}
+              style={styles.avatar}
+            />
+          ) : (
+            <Avatar.Text
+              size={80}
+              label={user?.name?.charAt(0).toUpperCase() || 'U'}
+              style={styles.avatar}
+            />
+          )}
+         
+
           <Text variant="headlineSmall" style={styles.userName}>
             {user?.name}
           </Text>
