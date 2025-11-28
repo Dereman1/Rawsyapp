@@ -88,8 +88,11 @@ router.put("/me/location", authenticate, updateFactoryOrBusinessLocation);
 router.post(
   "/me/upload-doc",
   authenticate,
-    
-    uploadSingle("file"),
+  (req, res, next) =>
+    uploadSingle("file")(req, res, (err) => {
+      if (err) return res.status(400).json({ error: err.message });
+      next();
+    }),
   uploadVerificationDoc
 );
 
