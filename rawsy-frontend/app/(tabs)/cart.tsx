@@ -51,6 +51,18 @@ export default function CartScreen() {
   };
 
   const handleCheckout = async () => {
+    if (!user?.factoryLocation?.address) {
+      Alert.alert(
+        'Delivery Address Required',
+        'Please set your factory location in your profile before placing an order.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Profile', onPress: () => {} }
+        ]
+      );
+      return;
+    }
+
     try {
       setCheckingOut(true);
       const response = await api.post('/cart/checkout', {
@@ -60,7 +72,8 @@ export default function CartScreen() {
       await fetchCart();
     } catch (error: any) {
       console.error('Checkout error:', error);
-      Alert.alert('Error', error.response?.data?.error || 'Checkout failed');
+      const errorMessage = error.response?.data?.error || 'Checkout failed';
+      Alert.alert('Checkout Error', errorMessage);
     } finally {
       setCheckingOut(false);
     }
