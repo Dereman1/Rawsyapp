@@ -10,6 +10,7 @@ import {
   Surface,
   Menu,
   Searchbar,
+  Snackbar,
 } from 'react-native-paper';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -18,6 +19,7 @@ import { useRouter } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import api from '../../services/api';
 import PaymentUploadDialog from '../../components/PaymentUploadDialog';
+import ReviewForm from '../ReviewForm'; 
 
 export default function OrdersScreen() {
   const { theme } = useTheme();
@@ -34,6 +36,9 @@ export default function OrdersScreen() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actioningOrderId, setActioningOrderId] = useState<string | null>(null);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarError, setSnackbarError] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -168,10 +173,15 @@ const handleCancelOrder = async (orderId: string) => {
           try {
             setActioningOrderId(orderId); // show loading state on this order
             await api.put(`/orders/${orderId}/cancel`); // call backend cancel endpoint
-            Alert.alert('Success', 'Order cancelled successfully');
-            await fetchOrders(); // refresh orders list
+              setSnackbarMessage('Order cancelled successfully');
+              setSnackbarError(false);
+              setSnackbarVisible(true);
+              await fetchOrders(); // refresh orders list
           } catch (error: any) {
-            Alert.alert('Error', error.response?.data?.error || 'Failed to cancel order');
+              const msg = error?.response?.data?.error || 'Failed to cancel order';
+              setSnackbarMessage(msg);
+              setSnackbarError(true);
+              setSnackbarVisible(true);
           } finally {
             setActioningOrderId(null);
           }
@@ -193,6 +203,41 @@ const handleCancelOrder = async (orderId: string) => {
       setActioningOrderId(null);
     }
   };
+ type OrderCardProps = {
+  order: any;
+};
+
+function OrderCard({ order }: OrderCardProps) {
+  return (
+    <Card style={{ marginTop: 12 }}>
+      <Card.Content>
+        <Text variant="titleMedium">Order #{order._id}</Text>
+        <Text>Status: {order.status}</Text>
+        <Text>Supplier: {order.supplier?.name || '-'}</Text>
+
+        {/* ✅ Review section */}
+        {order.status === 'delivered' ? (
+          <ReviewForm orderId={order._id} />
+        ) : (
+          <Text style={{ color: '#999', marginTop: 8, fontSize: 12 }}>
+            You can review the supplier after this order  delivery.
+          </Text>
+        )}
+        {user?.role === 'manufacturer' && order.status === 'delivered' && (
+  <Button
+    mode="contained"
+    icon="star"
+    style={{ marginTop: 10 }}
+    onPress={() => router.push(`/review/${order._id}`)}
+  >
+    Write Review
+  </Button>
+)}
+
+      </Card.Content>
+    </Card>
+  );
+}
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -277,6 +322,9 @@ const handleCancelOrder = async (orderId: string) => {
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title={isSupplier ? 'Supplier Orders' : 'My Orders'} />
+        {user?.role === 'manufacturer' && (
+          <Appbar.Action icon="file-document" onPress={() => router.push('/invoices')} />
+        )}
         {isSupplier && (
           <Menu
             visible={filterMenuVisible}
@@ -432,32 +480,67 @@ const handleCancelOrder = async (orderId: string) => {
                     </Text>
                   </View>
 
-                  {user?.role === 'manufacturer' &&
-                    order.paymentMethod === 'bank_transfer' &&
-                    order.paymentStatus === 'pending' && (
-                      <Button
-                        mode="contained"
-                        onPress={() => handleUploadPayment(order._id)}
-                        style={styles.uploadButton}
-                        icon="upload"
-                      >
-                        Upload Payment Proof
-                      </Button>
-                    )}
-                     {user?.role === 'manufacturer' &&
-  user._id === order.manufacturer &&
-  order.status === 'placed' && (
-    <Button
-      mode="contained"
-      onPress={() => handleCancelOrder(order._id)}
-      style={styles.actionButton} // create a style for this button
-      icon="cancel"
-      loading={actioningOrderId === order._id} // optional: show spinner while cancelling
-      disabled={actioningOrderId === order._id} // prevent multiple clicks
-    >
-      Cancel Order
-    </Button>
-)}
+                  {(() => {
+                    const showUpload = user?.role === 'manufacturer' && order.paymentMethod === 'bank_transfer' && order.paymentStatus === 'pending';
+                    const showCancel = user?.role === 'manufacturer' && String(order.status || '').trim().toLowerCase() === 'placed';
+
+                    if (showUpload && showCancel) {
+                      return (
+                        <View style={styles.actionRow}>
+                          <Button
+                            mode="contained"
+                            onPress={() => handleUploadPayment(order._id)}
+                            style={[styles.actionBtnHalf, { marginRight: 8 }]}
+                            icon="upload"
+                          >
+                            Upload Proof
+                          </Button>
+
+                          <Button
+                            mode="contained"
+                            onPress={() => handleCancelOrder(order._id)}
+                            style={[styles.actionBtnHalf, { backgroundColor: '#ef4444' }]}
+                            icon="cancel"
+                            loading={actioningOrderId === order._id}
+                            disabled={actioningOrderId === order._id}
+                            textColor="#fff"
+                          >
+                            Cancel
+                          </Button>
+                        </View>
+                      );
+                    }
+
+                    if (showUpload) {
+                      return (
+                        <Button
+                          mode="contained"
+                          onPress={() => handleUploadPayment(order._id)}
+                          style={styles.uploadButton}
+                          icon="upload"
+                        >
+                          Upload Payment Proof
+                        </Button>
+                      );
+                    }
+
+                    if (showCancel) {
+                      return (
+                        <Button
+                          mode="contained"
+                          onPress={() => handleCancelOrder(order._id)}
+                          style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
+                          icon="cancel"
+                          loading={actioningOrderId === order._id}
+                          disabled={actioningOrderId === order._id}
+                        >
+                          Cancel Order
+                        </Button>
+                      );
+                    }
+
+                    return null;
+                  })()}
 
                   {order.paymentProof && (
                     <View style={[styles.proofSection, { backgroundColor: theme.colors.primaryContainer }]}>
@@ -545,6 +628,15 @@ const handleCancelOrder = async (orderId: string) => {
           }}
         />
       )}
+
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={3000}
+        style={{ backgroundColor: snackbarError ? '#b91c1c' : undefined }}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </View>
   );
 }
@@ -661,6 +753,15 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  actionBtnHalf: {
+    flex: 1,
+    paddingVertical: 6,
   },
   statusButton: {
     marginTop: 4,

@@ -12,7 +12,7 @@ import {
 } from 'react-native-paper';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import api from '../../services/api';
@@ -32,6 +32,17 @@ export default function ProductDetailsScreen() {
   const [addingToWishlist, setAddingToWishlist] = useState(false);
   const [showQuoteDialog, setShowQuoteDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const scrollRef = useRef<any>(null);
+  const [supplierY, setSupplierY] = useState<number>(0);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
   useEffect(() => {
     if (id) {
@@ -72,7 +83,68 @@ export default function ProductDetailsScreen() {
       setAddingToCart(false);
     }
   };
+const handleBuyNowCheckout = async () => {
+  if (!product) {
+    Alert.alert('Error', 'Product not found');
+    return;
+  }
 
+  if (product.stock === 0) {
+    Alert.alert('Out of Stock', 'This product is unavailable');
+    return;
+  }
+
+  const deliveryRequired =
+    product?.deliveryAvailable && product?.deliveryAllowed !== false;
+
+  if (deliveryRequired && !user?.factoryLocation?.address) {
+    Alert.alert(
+      'Delivery Address Required',
+      'Please set your factory location in your profile before placing an order.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Go to Profile', onPress: () => router.push('/account') },
+      ]
+    );
+    return;
+  }
+
+  const availablePaymentMethods =
+    product.paymentMethod &&
+    Array.isArray(product.paymentMethod) &&
+    product.paymentMethod.length > 0
+      ? product.paymentMethod
+      : ['bank_transfer'];
+
+  const paymentMethod = availablePaymentMethods[0];
+
+  try {
+    setCheckingOut(true);
+
+    const checkoutPayload: any = {
+      productId: product._id,
+      quantity: 1,
+      paymentMethod,
+    };
+
+    if (deliveryRequired && user?.factoryLocation) {
+      checkoutPayload.delivery = {
+        address: user.factoryLocation.address,
+        contactName: user.factoryLocation.contactName,
+        contactPhone: user.factoryLocation.contactPhone,
+      };
+    }
+
+    const response = await api.post('/cart/checkout-direct', checkoutPayload);
+
+    Alert.alert('Success', 'Order placed successfully!');
+  } catch (error: any) {
+    console.error('Checkout error:', error);
+    Alert.alert('Checkout Error', error.response?.data?.error || 'Checkout failed');
+  } finally {
+    setCheckingOut(false);
+  }
+};
   const handleAddToWishlist = async () => {
     try {
       setAddingToWishlist(true);
@@ -124,12 +196,20 @@ export default function ProductDetailsScreen() {
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image || 'https://via.placeholder.com/400'];
   const finalPrice = product.discount?.active ? product.finalPrice : product.price;
+  const supplierVerified = Boolean(product.supplier?.verifiedSupplier || product.supplier?.verified || product.supplier?.isVerified);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title={product.name} />
+        <Appbar.Action icon="store" onPress={() => {
+          if (product?.supplier?._id) {
+            router.push({ pathname: '/supplier/[id]', params: { id: product.supplier._id, supplier: JSON.stringify(product.supplier) } });
+            return;
+          }
+          try { scrollRef.current?.scrollTo({ y: supplierY - 16, animated: true }); } catch (e) { console.warn('scroll error', e); }
+        }} />
         {user?.role === 'manufacturer' && (
           <Appbar.Action
             icon="heart-outline"
@@ -139,18 +219,27 @@ export default function ProductDetailsScreen() {
         )}
       </Appbar.Header>
 
-      <ScrollView style={styles.content}>
+      <ScrollView ref={scrollRef} style={styles.content}>
         <View style={styles.imageSection}>
           <View style={styles.mainImageContainer}>
             <Card.Cover
               source={{ uri: images[selectedImage] }}
               style={styles.mainImage}
             />
-            {product.discount?.active && (
-              <Badge style={styles.discountBadge} size={32}>
-                {String(product.discount.percentage) + '%'}
-              </Badge>
-            )}
+           {product.discount?.active && (
+          <View style={styles.discountContainer}>
+         <Badge style={styles.discountBadge} size={32}>
+      {`${product.discount.percentage}%`}
+    </Badge>
+
+    {product.discount?.expiresAt && (
+      <Text style={styles.discountExpireText}>
+        Ends {formatDate(product.discount.expiresAt)}
+      </Text>
+
+    )}
+ </View>
+           )}
             {product.stock === 0 && (
               <View style={styles.outOfStockOverlay}>
                 <Text style={styles.outOfStockText}>Out of Stock</Text>
@@ -182,6 +271,11 @@ export default function ProductDetailsScreen() {
               <Text variant="headlineSmall" style={styles.productName}>
                 {product.name}
               </Text>
+              {product.flagged && (
+        <Badge style={styles.flaggedBadge} size={24}>
+          FLAGGED
+        </Badge>
+      )}
               <Chip style={styles.categoryChip} textStyle={{ textTransform: 'capitalize' }}>
                 {product.category}
               </Chip>
@@ -262,16 +356,21 @@ export default function ProductDetailsScreen() {
           </Surface>
         )}
 
-        <Surface style={styles.section} elevation={1}>
+        <Surface style={styles.section} elevation={1} onLayout={(e) => setSupplierY(e.nativeEvent.layout.y)}>
           <Text variant="titleLarge" style={styles.sectionTitle}>
             Supplier Information
           </Text>
           <View style={styles.supplierRow}>
             <MaterialIcons name="store" size={28} color={theme.colors.primary} />
             <View style={styles.supplierInfo}>
-              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-                {product.supplier?.name || 'Unknown Supplier'}
-              </Text>
+              <View style={styles.supplierHeaderRow}>
+                <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                  {product.supplier?.name || 'Unknown Supplier'}
+                </Text>
+                {supplierVerified && (
+                  <Badge style={styles.verifiedBadge} size={20}>Verified</Badge>
+                )}
+              </View>
 
               {product.supplier?.companyName && (
                 <Text variant="bodyMedium" style={styles.supplierText}>
@@ -298,15 +397,6 @@ export default function ProductDetailsScreen() {
                     {product.supplier.contact}
                   </Text>
                 </TouchableOpacity>
-              )}
-
-              {product.supplier?.verifiedSupplier && (
-                <View style={styles.verifiedBadge}>
-                  <MaterialIcons name="verified" size={18} color="#10b981" />
-                  <Text variant="bodySmall" style={{ color: '#10b981', marginLeft: 4 }}>
-                    Verified Supplier
-                  </Text>
-                </View>
               )}
             </View>
           </View>
@@ -338,9 +428,9 @@ export default function ProductDetailsScreen() {
           {!product.negotiable && (
             <Button
               mode="contained"
-              onPress={handleAddToCart}
-              loading={addingToCart}
-              disabled={addingToCart || product.stock === 0}
+              onPress={handleBuyNowCheckout}
+              loading={checkingOut}
+              disabled={checkingOut || !product || product.stock === 0}
               style={styles.actionButton}
               icon="shopping"
             >
@@ -529,11 +619,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
+    marginLeft: 8,
+    backgroundColor: '#10b981',
+    color: '#fff',
+    height: 20,
+    alignSelf: 'center',
   },
+  supplierHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionBar: {
     flexDirection: 'row',
     padding: 16,
@@ -543,4 +635,32 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
   },
+
+  nameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  flaggedBadge: {
+    backgroundColor: '#ef4444',
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  discountContainer: {
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  alignItems: 'center',
+},
+
+discountExpireText: {
+  marginTop: 4,
+  fontSize: 11,
+  color: '#fff',
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 6,
+},
+
 });
